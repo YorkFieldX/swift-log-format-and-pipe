@@ -1,3 +1,93 @@
+# LoggingFormatAndPipe Emoji & Pretty FileName Mod
+I made this little mod to allow for better logging on Swift Vapor Backend. This would not have been possible without the original project (https://github.com/Adorkable/swift-log-format-and-pipe)
+
+List of changes/added components:
+level --> levelText : Log level as text
+level --> levelTextCapitalised : Log level as text starting with a capital letter
+level --> levelEmoji : Log level as emoji
+level --> levelEmojiColour : Log level as emoji (colour circles)
+file --> filename : The log's originating filename (without full path, without .ext at the end of the filename)
+file --> filenameWithExtension : The log's originating filename (without full path)
+
+Using the changes above, you can get your logs looking like this
+```
+2021-01-22T01:48:30+1100 | 🔵 Info | main.swift:22 | Testing Info
+2021-01-22T01:48:30+1100 | 🟢 Notice | main.swift:23 | Testing Notice
+2021-01-22T01:48:30+1100 | 🟡 Warning | main.swift:24 | Testing Error
+2021-01-22T01:48:30+1100 | 🟠 Error | main.swift:25 | Testing Error
+2021-01-22T01:48:30+1100 | 🔴 Critical | main.swift:26 | Testing Critical
+```
+
+by using this configuration
+
+```swift
+LoggingFormatAndPipe.Handler(
+        formatter: BasicFormatter(
+            [
+                .timestamp,
+                .group([LogComponent.levelEmojiColour, LogComponent.text(" "), LogComponent.levelTextCapitalised]),
+                .group([LogComponent.filenameWithExtension, LogComponent.text(":"), LogComponent.line]),
+                .message
+            ],
+            separator: " | "
+        ),
+        pipe: LoggerTextOutputStreamPipe.standardOutput
+    )
+```
+or like this
+
+```
+2021-01-22T01:49:55+1100 | ℹ️ Info | main.swift:22 | Testing Info
+2021-01-22T01:49:55+1100 | 🔔 Notice | main.swift:23 | Testing Notice
+2021-01-22T01:49:55+1100 | ⚠️ Warning | main.swift:24 | Testing Error
+2021-01-22T01:49:55+1100 | ❗️ Error | main.swift:25 | Testing Error
+2021-01-22T01:49:55+1100 | 🔥 Critical | main.swift:26 | Testing Critical
+```
+
+using this configuration
+
+```swift
+LoggingFormatAndPipe.Handler(
+        formatter: BasicFormatter(
+            [
+                .timestamp,
+                .group([LogComponent.levelEmoji, LogComponent.text(" "), LogComponent.levelTextCapitalised]),
+                .group([LogComponent.filenameWithExtension, LogComponent.text(":"), LogComponent.line]),
+                .message
+            ],
+            separator: " | "
+        ),
+        pipe: LoggerTextOutputStreamPipe.standardOutput
+    )
+```
+
+To use this in your Vapor 4 application, you need to add this repository in your package.swift, and edit main.swift file
+
+```swift
+.package(url: "https://github.com/YorkFieldX/swift-log-format-and-pipe", from: "0.1.2"),
+```
+
+
+```swift
+LoggingSystem.bootstrap({ str in
+    return LoggingFormatAndPipe.Handler(
+        formatter: BasicFormatter(
+            //Your configuration goes here
+        ),
+        pipe: LoggerTextOutputStreamPipe.standardOutput
+    )
+})
+```
+
+Don't forget
+```swift
+import LoggingFormatAndPipe
+```
+
+For any more information or customisation options please refer to the original readme below.
+
+Have fun :)
+
 # LoggingFormatAndPipe
 **LoggingFormatAndPipe** provides a [Swift Logging API](https://github.com/apple/swift-log) Handler which allows you to customized both your log messages' formats as well as their destinations.
 
