@@ -30,6 +30,7 @@ public struct LoggerTextOutputStreamPipe: Pipe {
         var stream = self.stream
         if stream == nil {
             Swift.print("\(formattedLogLine)")
+            fflush(stdout)
             return
         }
         stream!.write("\(formattedLogLine)\n")
