@@ -1,6 +1,35 @@
 # LoggingFormatAndPipe Emoji & Pretty FileName Mod
 I made this little mod to allow for better logging on Swift Vapor Backend. This would not have been possible without the original project (https://github.com/Adorkable/swift-log-format-and-pipe)
 
+### Quick Start Guide
+Package.swift
+```
+.package(url: "https://github.com/YorkFieldX/swift-log-format-and-pipe", from: "0.1.3")
+```
+
+Main.swift
+```
+import LoggingFormatAndPipe
+
+LoggingSystem.bootstrap({ str in
+    return LoggingFormatAndPipe.Handler(
+        formatter: BasicFormatter.vapor,
+        pipe: LoggerTextOutputStreamPipe.standardOutput
+    )
+})
+```
+
+Results
+```
+2021-01-22T02:57:40+1100 | 🔵 Info     | main.swift                         @L13  | Testing Info
+2021-01-22T02:57:40+1100 | 🟢 Notice   | main.swift                         @L14  | Testing Notice
+2021-01-22T02:57:40+1100 | 🟡 Warning  | main.swift                         @L15  | Testing Warning
+2021-01-22T02:57:40+1100 | 🟠 Error    | main.swift                         @L16  | Testing Error
+2021-01-22T02:57:40+1100 | 🔴 Critical | main.swift                         @L17  | Testing Critical
+```
+
+### Details
+
 List of changes/added components:
 ```
 level --> levelText : Log level as text
@@ -66,7 +95,7 @@ LoggingFormatAndPipe.Handler(
 To use this in your Vapor 4 application, you need to add this repository in your package.swift, and edit main.swift file
 
 ```swift
-.package(url: "https://github.com/YorkFieldX/swift-log-format-and-pipe", from: "0.1.2"),
+.package(url: "https://github.com/YorkFieldX/swift-log-format-and-pipe", from: "0.1.3"),
 ```
 
 
