@@ -22,6 +22,8 @@ public enum LogComponent {
     case metadata
     /// The log's originating file
     case file
+    /// The log's originating filename (without full path)
+    case filename
     /// The log's originating function
     case function
     /// The log's originating line number
@@ -40,6 +42,7 @@ public enum LogComponent {
             .message,
             .metadata,
             .file,
+            .filename,
             .function,
             .line
         ]
@@ -92,6 +95,8 @@ extension Formatter {
             return "\(prettyMetadata.map { "\($0)" } ?? "")"
         case .file:
             return "\(file)"
+        case .filename:
+            return "\(file.split(separator: "/").last ?? "Unknown"))"
         case .function:
             return "\(function)"
         case .line:
