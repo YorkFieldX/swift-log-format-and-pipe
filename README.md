@@ -2,12 +2,14 @@
 I made this little mod to allow for better logging on Swift Vapor Backend. This would not have been possible without the original project (https://github.com/Adorkable/swift-log-format-and-pipe)
 
 List of changes/added components:
+```
 level --> levelText : Log level as text
 level --> levelTextCapitalised : Log level as text starting with a capital letter
 level --> levelEmoji : Log level as emoji
 level --> levelEmojiColour : Log level as emoji (colour circles)
 file --> filename : The log's originating filename (without full path, without .ext at the end of the filename)
 file --> filenameWithExtension : The log's originating filename (without full path)
+```
 
 Using the changes above, you can get your logs looking like this
 ```
