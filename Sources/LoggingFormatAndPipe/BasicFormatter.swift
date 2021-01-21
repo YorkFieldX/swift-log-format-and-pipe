@@ -18,6 +18,12 @@ public struct BasicFormatter: Formatter {
     public let separator: String?
     /// Log timestamp component formatter
     public let timestampFormatter: DateFormatter
+    /// Allows you to align log level text
+    public let alignLogLevels: Bool
+    /// Allows you to align shortened filenames. Set to a predicted maximum filename length. Set to -1 to disable
+    public let filenameAlignment: Int
+    /// Allows you to align code line numbers. Set to a predicted maximum number of digits in code line numbers (e.g. 4 for line numbers up to 9999). Set to -1 to disable
+    public let lineNumberAlignment: Int
 
     /// Default timestamp component formatter
     static public var timestampFormatter: DateFormatter {
@@ -30,11 +36,22 @@ public struct BasicFormatter: Formatter {
     /// - Parameters:
     ///   - _: Log format specification(default: `LogComponent.allNonmetaComponents`)
     ///   - separator: Log component separator (default: " ")
+    ///   - alignLogLevels: Aligns the log level text (default: true)
+    ///   - filenameAlignment: Aligns the shortened filename text to a specified number of characters(default: 35 characters; -1 to disable)
+    ///   - lineNumberAlignment: Aligns the code line numbers to a specified number of characters(default: 3 characters; -1 to disable)
     ///   - timestampFormatter: Log timestamp component formatter (default: `BasicFormatter.timestampFormatter`)
-    public init(_ format: [LogComponent] = LogComponent.allNonmetaComponents, separator: String = " ", timestampFormatter: DateFormatter = BasicFormatter.timestampFormatter) {
+    public init(_ format: [LogComponent] = LogComponent.allNonmetaComponents,
+                separator: String = " ",
+                alignLogLevels: Bool = true,
+                filenameAlignment: Int = 35,
+                lineNumberAlignment: Int = 3,
+                timestampFormatter: DateFormatter = BasicFormatter.timestampFormatter) {
         self.format = format
         self.separator = separator
         self.timestampFormatter = timestampFormatter
+        self.alignLogLevels = alignLogLevels
+        self.filenameAlignment = filenameAlignment
+        self.lineNumberAlignment = lineNumberAlignment
     }
 
     /// Our main log formatting method
@@ -53,7 +70,17 @@ public struct BasicFormatter: Formatter {
         let now = Date()
 
         return self.format.map({ (component) -> String in
-            return self.processComponent(component, now: now, level: level, message: message, prettyMetadata: prettyMetadata, file: file, function: function, line: line)
+            return self.processComponent(component,
+                                         now: now,
+                                         level: level,
+                                         message: message,
+                                         prettyMetadata: prettyMetadata,
+                                         file: file,
+                                         function: function,
+                                         line: line,
+                                         alignLogLevels: self.alignLogLevels,
+                                         filenameAlignment: self.filenameAlignment,
+                                         lineNumberAlignment: self.lineNumberAlignment)
         }).filter({ (string) -> Bool in
             return string.count > 0
         }).joined(separator: self.separator ?? "")
@@ -75,6 +102,16 @@ public struct BasicFormatter: Formatter {
             ]),
             .message
         ]
+    )
+    
+    public static let vapor = BasicFormatter(
+        [
+            .timestamp,
+            .group([LogComponent.levelEmojiColour, LogComponent.text(" "), LogComponent.levelTextCapitalised]),
+            .group([LogComponent.filenameWithExtension, LogComponent.text("@L"), LogComponent.line]),
+            .message
+        ],
+        separator: " | "
     )
 
     /// Adorkable's go-to log format 😘

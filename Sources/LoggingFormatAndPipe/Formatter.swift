@@ -95,14 +95,25 @@ extension Formatter {
     public func processComponent(_ component: LogComponent, now: Date, level: Logger.Level,
                                   message: Logger.Message,
                                   prettyMetadata: String?,
-                                  file: String, function: String, line: UInt) -> String {
+                                  file: String,
+                                  function: String,
+                                  line: UInt,
+                                  alignLogLevels: Bool,
+                                  filenameAlignment: Int,
+                                  lineNumberAlignment: Int) -> String {
         switch component {
         case .timestamp:
             return self.timestampFormatter.string(from: now)
         case .levelText:
-            return "\(level)"
+            if alignLogLevels {
+                return align(text: level.rawValue, numOfChars: 8)
+            }
+            return level.rawValue
         case .levelTextCapitalised:
-            return "\(level.rawValue.capitalized)"
+            if alignLogLevels {
+                return align(text: level.rawValue.capitalized, numOfChars: 8)
+            }
+            return level.rawValue.capitalized
         case .levelEmoji:
             switch level {
             case .trace:
@@ -144,18 +155,18 @@ extension Formatter {
         case .file:
             return "\(file)"
         case .filename:
-            return "\(getPrettyFileName(filename: file, includeExtension: false))"
+            return align(text: getPrettyFileName(filename: file, includeExtension: false), numOfChars: filenameAlignment)
         case .filenameWithExtension:
-            return "\(getPrettyFileName(filename: file, includeExtension: true))"
+            return align(text: getPrettyFileName(filename: file, includeExtension: true), numOfChars: filenameAlignment)
         case .function:
             return "\(function)"
         case .line:
-            return "\(line)"
+            return align(text: line.description, numOfChars: lineNumberAlignment)
         case .text(let string):
             return string
         case .group(let logComponents):
             return logComponents.map({ (component) -> String in
-                self.processComponent(component, now: now, level: level, message: message, prettyMetadata: prettyMetadata, file: file, function: function, line: line)
+                self.processComponent(component, now: now, level: level, message: message, prettyMetadata: prettyMetadata, file: file, function: function, line: line, alignLogLevels: alignLogLevels, filenameAlignment: filenameAlignment, lineNumberAlignment: lineNumberAlignment)
             }).joined()
         }
     }
@@ -169,5 +180,16 @@ extension Formatter {
             components.removeLast()
             return components.joined()
         }
+    }
+    
+    private func align(text: String, numOfChars: Int) -> String {
+        if numOfChars == -1 {
+            return text
+        }
+        var modifiedText = text;
+        while modifiedText.count < numOfChars {
+            modifiedText += " "
+        }
+        return modifiedText
     }
 }
