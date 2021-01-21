@@ -15,11 +15,11 @@ import Logging
 
 /// A pipe for sending logs to a `TextOutputStream`
 public struct LoggerTextOutputStreamPipe: Pipe {
-    private let stream: TextOutputStream
+    private let stream: TextOutputStream?
 
     /// Default init
     /// - Parameter _: Our stream to pipe to
-    public init(_ stream: TextOutputStream) {
+    public init(_ stream: TextOutputStream? = nil) {
         self.stream = stream
     }
 
@@ -28,7 +28,11 @@ public struct LoggerTextOutputStreamPipe: Pipe {
     ///   - _: The formatted log to handle
     public func handle(_ formattedLogLine: String) {
         var stream = self.stream
-        stream.write("\(formattedLogLine)\n")
+        if stream == nil {
+            Swift.print("\(formattedLogLine)")
+            return
+        }
+        stream!.write("\(formattedLogLine)\n")
     }
 }
 
@@ -41,6 +45,10 @@ extension LoggerTextOutputStreamPipe {
     /// Pipe logs to Standard Error (stderr)
     public static var standardError: LoggerTextOutputStreamPipe {
         return LoggerTextOutputStreamPipe(StdioOutputStream.stderr)
+    }
+    
+    public static var swiftPrint: LoggerTextOutputStreamPipe {
+        return LoggerTextOutputStreamPipe(nil)
     }
 
 }
