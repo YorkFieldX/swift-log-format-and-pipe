@@ -70,7 +70,7 @@ public struct BasicFormatter: Formatter {
         [
             .timestamp,
             .group([
-                .level,
+                .levelText,
                 .text(":"),
             ]),
             .message
@@ -87,7 +87,7 @@ public struct BasicFormatter: Formatter {
     public static let adorkable = BasicFormatter(
         [
             .timestamp,
-            .level,
+            .levelText,
             .group([
                 .file,
                 .text(":"),

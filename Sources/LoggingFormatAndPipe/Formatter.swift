@@ -14,16 +14,24 @@ public enum LogComponent {
     /// Specifying your timestamp format can be done by providing a DateFormatter through `Formatter.timestampFormatter`
     case timestamp
 
-    /// Log level
-    case level
+    /// Log level as text
+    case levelText
+    /// Log level as text starting with a capital letter
+    case levelTextCapitalised
+    /// Log level as emoji
+    case levelEmoji
+    /// Log level as emoji with colour circles
+    case levelEmojiColour
     /// The actual message
     case message
     /// Log metadata
     case metadata
     /// The log's originating file
     case file
-    /// The log's originating filename (without full path)
+    /// The log's originating filename (without full path, without .ext at the end of the filename)
     case filename
+    /// The log's originating filename (without full path)
+    case filenameWithExtension
     /// The log's originating function
     case function
     /// The log's originating line number
@@ -38,11 +46,15 @@ public enum LogComponent {
     public static var allNonmetaComponents: [LogComponent] {
         return [
             .timestamp,
-            .level,
+            .levelText,
+            .levelTextCapitalised,
+            .levelEmoji,
+            .levelEmojiColour,
             .message,
             .metadata,
             .file,
             .filename,
+            .filenameWithExtension,
             .function,
             .line
         ]
@@ -87,8 +99,44 @@ extension Formatter {
         switch component {
         case .timestamp:
             return self.timestampFormatter.string(from: now)
-        case .level:
+        case .levelText:
             return "\(level)"
+        case .levelTextCapitalised:
+            return "\(level.rawValue.capitalized)"
+        case .levelEmoji:
+            switch level {
+            case .trace:
+                return "🔎"
+            case .debug:
+                return "🐞"
+            case .info:
+                return "ℹ️"
+            case .notice:
+                return "🔔"
+            case .warning:
+                return "⚠️"
+            case .error:
+                return "❗️"
+            case .critical:
+                return "🔥"
+            }
+        case .levelEmojiColour:
+            switch level {
+            case .trace:
+                return "⚪️"
+            case .debug:
+                return "🟤"
+            case .info:
+                return "🔵"
+            case .notice:
+                return "🟢"
+            case .warning:
+                return "🟡"
+            case .error:
+                return "🟠"
+            case .critical:
+                return "🔴"
+            }
         case .message:
             return "\(message)"
         case .metadata:
@@ -96,7 +144,9 @@ extension Formatter {
         case .file:
             return "\(file)"
         case .filename:
-            return "\(file.split(separator: "/").last ?? "Unknown"))"
+            return "\(getPrettyFileName(filename: file, includeExtension: false))"
+        case .filenameWithExtension:
+            return "\(getPrettyFileName(filename: file, includeExtension: true))"
         case .function:
             return "\(function)"
         case .line:
@@ -107,6 +157,17 @@ extension Formatter {
             return logComponents.map({ (component) -> String in
                 self.processComponent(component, now: now, level: level, message: message, prettyMetadata: prettyMetadata, file: file, function: function, line: line)
             }).joined()
+        }
+    }
+    
+    private func getPrettyFileName(filename: String, includeExtension: Bool) -> String {
+        let file = (filename.split(separator: "/").last ?? "Unknown").description
+        if includeExtension {
+            return file
+        } else {
+            var components = file.split(separator: ".")
+            components.removeLast()
+            return components.joined()
         }
     }
 }
