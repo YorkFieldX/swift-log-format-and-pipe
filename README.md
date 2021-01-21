@@ -28,6 +28,13 @@ Results
 2021-01-22T02:57:40+1100 | 🔴 Critical | main.swift                         @L17  | Testing Critical
 ```
 
+To disable/customise log level, filename, or line number alignments specify these parameters in BasicFormatter constructor
+```
+alignLogLevels: false,  //true == on | false == off | default = true
+filenameAlignment: -1,  //X == on | -1 == off | default = 35
+lineNumberAlignment: -1 //X == on | -1 == off | default = 3
+```
+
 ### Details
 
 List of changes/added components:
@@ -60,7 +67,10 @@ LoggingFormatAndPipe.Handler(
                 .group([LogComponent.filenameWithExtension, LogComponent.text(":"), LogComponent.line]),
                 .message
             ],
-            separator: " | "
+            separator: " | ",
+	    alignLogLevels: false,
+            filenameAlignment: -1,
+            lineNumberAlignment: -1
         ),
         pipe: LoggerTextOutputStreamPipe.standardOutput
     )
@@ -86,7 +96,10 @@ LoggingFormatAndPipe.Handler(
                 .group([LogComponent.filenameWithExtension, LogComponent.text(":"), LogComponent.line]),
                 .message
             ],
-            separator: " | "
+            separator: " | ",
+	    alignLogLevels: false,
+            filenameAlignment: -1,
+            lineNumberAlignment: -1
         ),
         pipe: LoggerTextOutputStreamPipe.standardOutput
     )
